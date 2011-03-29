@@ -1,0 +1,93 @@
+cmake_minimum_required(VERSION 2.6)
+
+PROJECT(ITK_OneShot)
+
+FIND_PACKAGE(ITK REQUIRED)
+INCLUDE(${ITK_USE_FILE})
+
+ADD_EXECUTABLE(AbsImage AbsImage.cxx)
+TARGET_LINK_LIBRARIES(AbsImage ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(AddImages AddImages.cxx)
+TARGET_LINK_LIBRARIES(AddImages ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(AddNoise AddNoise.cxx)
+TARGET_LINK_LIBRARIES(AddNoise ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(AndImages AndImages.cxx)
+TARGET_LINK_LIBRARIES(AndImages ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(AppendImageComponents AppendImageComponents.cxx)
+TARGET_LINK_LIBRARIES(AppendImageComponents ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ComputeDerivatives ComputeDerivatives.cxx)
+TARGET_LINK_LIBRARIES(ComputeDerivatives ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ComputeLaplacian ComputeLaplacian.cxx)
+TARGET_LINK_LIBRARIES(ComputeLaplacian ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ConvertToMHD ConvertToMHD.cxx)
+TARGET_LINK_LIBRARIES(ConvertToMHD ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(DilateImage DilateImage.cxx)
+TARGET_LINK_LIBRARIES(DilateImage ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ErodeImage ErodeImage.cxx)
+TARGET_LINK_LIBRARIES(ErodeImage ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ExtractComponent ExtractComponent.cxx)
+TARGET_LINK_LIBRARIES(ExtractComponent ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(FindBoundary FindBoundary.cxx)
+TARGET_LINK_LIBRARIES(FindBoundary ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(FlipImage FlipImage.cxx)
+TARGET_LINK_LIBRARIES(FlipImage ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ForwardDifferenceDerivatives ForwardDifferenceDerivatives.cxx)
+TARGET_LINK_LIBRARIES(ForwardDifferenceDerivatives ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(InvertImage InvertImage.cxx)
+TARGET_LINK_LIBRARIES(InvertImage ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(MaskImage MaskImage.cxx)
+TARGET_LINK_LIBRARIES(MaskImage ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(MHDtoPNG MHDtoPNG.cxx)
+TARGET_LINK_LIBRARIES(MHDtoPNG ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(MultiplyScalar MultiplyScalar.cxx)
+TARGET_LINK_LIBRARIES(MultiplyScalar ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(OrImages OrImages.cxx)
+TARGET_LINK_LIBRARIES(OrImages ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ReplaceComponent ReplaceComponent.cxx)
+TARGET_LINK_LIBRARIES(ReplaceComponent ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ReplaceValue ReplaceValue.cxx)
+TARGET_LINK_LIBRARIES(ReplaceValue ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(RescaleToPNG RescaleToPNG.cxx)
+TARGET_LINK_LIBRARIES(RescaleToPNG ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(RGBtoGray RGBtoGray.cxx)
+TARGET_LINK_LIBRARIES(RGBtoGray ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(SetBoundaryToConstant SetBoundaryToConstant.cxx)
+TARGET_LINK_LIBRARIES(SetBoundaryToConstant ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(SmoothImage SmoothImage.cxx)
+TARGET_LINK_LIBRARIES(SmoothImage ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(SquaredDifference SquaredDifference.cxx)
+TARGET_LINK_LIBRARIES(SquaredDifference ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ThresholdAbove ThresholdAbove.cxx)
+TARGET_LINK_LIBRARIES(ThresholdAbove ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(ThresholdBelow ThresholdBelow.cxx)
+TARGET_LINK_LIBRARIES(ThresholdBelow ${ITK_LIBRARIES})
+
+ADD_EXECUTABLE(XorImages XorImages.cxx)
+TARGET_LINK_LIBRARIES(XorImages ${ITK_LIBRARIES})
