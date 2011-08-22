@@ -4,7 +4,7 @@
 #include "itkImageRegionIterator.h"
 #include "itkVariableLengthVector.h"
 
-typedef itk::VectorImage<float, 2> VectorImageType;
+typedef itk::VectorImage<unsigned char, 2> VectorImageType;
 
 // This program replaces the input value with the output value across all components of the input image
 int main(int argc, char *argv[])

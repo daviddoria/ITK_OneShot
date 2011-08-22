@@ -1,10 +1,11 @@
+// Currently this is a directy copy/paste from MaskImage
+
 #include "itkVectorImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkImageRegionIterator.h"
 
-//typedef itk::VectorImage<float, 2>  ImageType;
-typedef itk::VectorImage<unsigned char, 2>  ImageType;
+typedef itk::VectorImage<float, 2>  ImageType;
 typedef itk::Image<unsigned char, 2>  MaskType;
 
 // This code replaces every pixel in 'imageFilename' corresponding to a non-zero pixel in 'maskFilename' with 'value'
@@ -59,8 +60,7 @@ int main(int argc, char *argv[])
 
   while(!imageIterator.IsAtEnd())
     {
-    //if(!maskIterator.Get()) // The pixel is unknown (here we are defining a "known" pixel as white/nonzero)
-    if(maskIterator.Get())
+    if(!maskIterator.Get()) // The pixel is unknown (here we are defining a "known" pixel as white/nonzero)
       {
       // Set the output image to a pixel with every component set to 'value'
       VariableVectorType pixel;

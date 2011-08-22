@@ -13,14 +13,20 @@ int main(int argc, char *argv[])
   // Verify arguments
   if(argc < 3)
     {
-    std::cerr << "Required: inputFilename outputFilename" << std::endl;
+    std::cerr << "Required: inputFilename outputFilename radius" << std::endl;
     return EXIT_FAILURE;
     }
 
   // Parse arguments
   std::string inputFilename = argv[1];
   std::string outputFilename = argv[2];
+  std::string strRadius = argv[3];
 
+  std::stringstream ss;
+  ss << strRadius;
+  unsigned int radius = 1;
+  ss >> radius;
+  
   // Output arguments
   std::cout << "inputFilename " << inputFilename << std::endl;
   std::cout << "outputFilename " << outputFilename << std::endl;
@@ -31,7 +37,6 @@ int main(int argc, char *argv[])
   reader->SetFileName(inputFilename);
   reader->Update();
 
-  unsigned int radius = 1;
   typedef itk::BinaryBallStructuringElement<ImageType::PixelType, 2> StructuringElementType;
   StructuringElementType structuringElement;
   structuringElement.SetRadius(radius);
