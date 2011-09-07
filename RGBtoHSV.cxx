@@ -2,6 +2,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkImageAdaptor.h"
+#include "itkCastImageFilter.h"
 #include "itkRGBToHSVColorSpacePixelAccessor.h"
 
 int main( int argc, char * argv[])
@@ -24,6 +25,7 @@ int main( int argc, char * argv[])
   // Typedefs
   typedef itk::RGBPixel<unsigned char> RGBPixelType;
   typedef itk::Image<RGBPixelType, 2> RGBImageType;
+  
   typedef itk::ImageFileReader<RGBImageType> ImageFileReaderType;
   
   // Instantiate reader for input image.
@@ -40,13 +42,20 @@ int main( int argc, char * argv[])
   typedef itk::ImageAdaptor<RGBImageType, RGBToHSVColorSpaceAccessorType> RGBToHSVAdaptorType;
   RGBToHSVAdaptorType::Pointer rgbToHSVAdaptor = RGBToHSVAdaptorType::New();
   rgbToHSVAdaptor->SetImage(rgbImage);
-    
-  typedef itk::ImageFileWriter<RGBToHSVAdaptorType> OutputWriterType;
+
+
+  typedef itk::Image<itk::Vector<float, 3>, 2> FloatVectorImageType;
+  
+  typedef itk::CastImageFilter<RGBToHSVAdaptorType, FloatVectorImageType> CastFilterType;
+  CastFilterType::Pointer castFilter = CastFilterType::New();
+  castFilter->SetInput(rgbToHSVAdaptor);
+  castFilter->Update();
+  
+  typedef itk::ImageFileWriter<FloatVectorImageType> OutputWriterType;
   OutputWriterType::Pointer writer = OutputWriterType::New();
-  writer->SetInput(rgbToHSVAdaptor);
+  writer->SetInput(castFilter->GetOutput());
   writer->SetFileName(outputFileName);
   writer->Update();
-
+  
   return EXIT_SUCCESS;
 }
-

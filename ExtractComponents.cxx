@@ -78,6 +78,11 @@ int main(int argc, char *argv[])
 
 void ExtractComponent(VectorImageType::Pointer input, ScalarImageType::Pointer output, unsigned int component)
 {
+  if(component >= input->GetNumberOfComponentsPerPixel())
+    {
+    std::cerr << "Cannot extract component " << component << " from input with " << input->GetNumberOfComponentsPerPixel() << " components!" << std::endl;
+    exit(-1);
+    }
   output->SetRegions(input->GetLargestPossibleRegion());
   output->Allocate();
   output->FillBuffer(0);
@@ -96,6 +101,12 @@ void ExtractComponent(VectorImageType::Pointer input, ScalarImageType::Pointer o
 
 void SetComponent(VectorImageType::Pointer image, ScalarImageType::Pointer componentImage, unsigned int component)
 {
+  if(component >= image->GetNumberOfComponentsPerPixel())
+    {
+    std::cerr << "Cannot set component " << component << " of image with " << image->GetNumberOfComponentsPerPixel() << " components!" << std::endl;
+    exit(-1);
+    }
+    
   itk::ImageRegionIterator<VectorImageType> imageIterator(image, image->GetLargestPossibleRegion());
   itk::ImageRegionConstIterator<ScalarImageType> componentIterator(componentImage, componentImage->GetLargestPossibleRegion());
 
