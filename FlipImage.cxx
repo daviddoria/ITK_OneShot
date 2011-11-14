@@ -31,6 +31,10 @@ int main(int argc, char *argv[])
   flipAxes[1] = true;
   flipFilter->SetFlipAxes(flipAxes);
   flipFilter->Update();
+  
+  RGBImageType::PointType origin;
+  origin.Fill(0);
+  flipFilter->GetOutput()->SetOrigin(origin);
 
   typedef  itk::ImageFileWriter< RGBImageType  > WriterType;
   WriterType::Pointer writer = WriterType::New();

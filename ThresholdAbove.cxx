@@ -5,6 +5,9 @@
 
 typedef itk::Image<float, 2> ImageType;
 
+/*
+ * Keep values BELOW the threshold (even though it is called ThresholdAbove)
+ */
 int main(int argc, char *argv[])
 {
   // Verify arguments

@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
   typedef itk::VectorIndexSelectionCastImageFilter<VectorImageType, ScalarImageType> DisassemblerType;
   typedef itk::ImageToVectorImageFilter<ScalarImageType> ReassemblerType;
   
-    ReassemblerType::Pointer reassembler = ReassemblerType::New();
+  ReassemblerType::Pointer reassembler = ReassemblerType::New();
   // Perform the Poisson reconstruction on each channel (source/Laplacian pair) independently
   
   typedef itk::LaplacianImageFilter<ScalarImageType, ScalarImageType>  LaplacianFilterType;

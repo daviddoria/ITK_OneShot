@@ -62,13 +62,14 @@ int main(int argc, char *argv[])
     }
 
   typedef  itk::ImageFileWriter<ImageType> WriterType;
+  /*
   WriterType::Pointer writer = WriterType::New();
   writer->SetFileName(outputFilename);
   writer->SetInput(image);
   writer->Update();
-  
+  */
   WriterType::Pointer differenceWriter = WriterType::New();
-  differenceWriter->SetFileName("differenceimage.png");
+  differenceWriter->SetFileName(outputFilename);
   differenceWriter->SetInput(differenceFilter->GetOutput());
   differenceWriter->Update();
 
