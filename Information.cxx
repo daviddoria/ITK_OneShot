@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
   reader->Update();
 
   std::cout << "Number of components: " << reader->GetOutput()->GetNumberOfComponentsPerPixel() << std::endl;
+  std::cout << "Region: " << reader->GetOutput()->GetLargestPossibleRegion() << std::endl;
 
   return EXIT_SUCCESS;
 }

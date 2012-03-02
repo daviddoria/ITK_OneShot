@@ -1,0 +1,6 @@
+# SET(BuildTests CACHE BOOL "Build some tests of the tools")
+# if(BuildTests)
+#   ADD_EXECUTABLE(TestAsciiToImage TestAsciiToImage.cpp)
+#   TARGET_LINK_LIBRARIES(TestAsciiToImage ${ITK_LIBRARIES})
+#   INSTALL( TARGETS TestAsciiToImage RUNTIME DESTINATION ${INSTALL_DIR} )
+# endif()
