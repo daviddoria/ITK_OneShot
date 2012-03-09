@@ -78,7 +78,8 @@ int main(int argc, char *argv[])
   {
     for(unsigned int col = 0; col < numberOfColumns; ++col)
     {
-    itk::Index<2> index = {{row, col}};
+    //itk::Index<2> index = {{row, col}}; // This is wrong
+    itk::Index<2> index = {{col, row}};
     image->SetPixel(index, rows[row][col]);
     }
   }

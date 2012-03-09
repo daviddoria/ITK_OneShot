@@ -4,27 +4,28 @@
 #include "itkCovariantVector.h"
 #include "itkImageRegionIterator.h"
 #include "itkNeighborhoodOperatorImageFilter.h"
-#include "itkSobelOperator.h"
 #include "itkForwardDifferenceOperator.h"
-#include "itkGaussianDerivativeOperator.h"
+#include "itkComposeImageFilter.h"
 
 typedef itk::Image<float, 2> ImageType;
 
-typedef itk::Image<itk::CovariantVector<float, 2>, 2>  DerivativeImageType;
-
 int main(int argc, char *argv[])
 {
-  if(argc < 3)
+  if(argc < 5)
     {
-    std::cerr << "Required: inputFilename outputFilename" << std::endl;
+    std::cerr << "Required: inputFilename outputFilenameX outputFilenameY outputGradientFileName" << std::endl;
     return EXIT_FAILURE;
     }
 
   std::string inputFilename = argv[1];
-  std::string outputFilename = argv[2];
+  std::string outputFilenameX = argv[2];
+  std::string outputFilenameY = argv[3];
+  std::string outputFilenameGradient = argv[4];
 
   std::cout << "inputFilename " << inputFilename << std::endl;
-  std::cout << "outputFilename " << outputFilename << std::endl;
+  std::cout << "outputFilenameX " << outputFilenameX << std::endl;
+  std::cout << "outputFilenameY " << outputFilenameY << std::endl;
+  std::cout << "outputFilenameGradient " << outputFilenameGradient << std::endl;
 
   typedef itk::ImageFileReader<ImageType> ReaderType;
   ReaderType::Pointer reader = ReaderType::New();
@@ -58,35 +59,34 @@ int main(int argc, char *argv[])
   yDerivativeFilter->SetInput(reader->GetOutput());
   yDerivativeFilter->Update();
 
+  // Write the resulting derivate images
+  {
+  typedef  itk::ImageFileWriter<ImageType> WriterType;
+
+  WriterType::Pointer xWriter = WriterType::New();
+  xWriter->SetFileName(outputFilenameX);
+  xWriter->SetInput(xDerivativeFilter->GetOutput());
+  xWriter->Update();
+
+  WriterType::Pointer yWriter = WriterType::New();
+  yWriter->SetFileName(outputFilenameY);
+  yWriter->SetInput(yDerivativeFilter->GetOutput());
+  yWriter->Update();
+  }
+
   // Combine the derivative images
-  DerivativeImageType::Pointer derivativeImage = DerivativeImageType::New();
-  derivativeImage->SetRegions(reader->GetOutput()->GetLargestPossibleRegion());
-  derivativeImage->Allocate();
+  typedef itk::ComposeImageFilter<ImageType> ComposeImageFilterType;
+  ComposeImageFilterType::Pointer composeImageFilterType = ComposeImageFilterType::New();
+  composeImageFilterType->SetInput(0, xDerivativeFilter->GetOutput());
+  composeImageFilterType->SetInput(1, yDerivativeFilter->GetOutput());
+  composeImageFilterType->Update();
+  
+  typedef  itk::ImageFileWriter<typename ComposeImageFilterType::OutputImageType> GradientWriterType;
 
-  itk::ImageRegionIterator<DerivativeImageType> outputIterator(derivativeImage, derivativeImage->GetLargestPossibleRegion());
-  itk::ImageRegionConstIterator<ImageType> xDerivativeIterator(xDerivativeFilter->GetOutput(),
-                                                               xDerivativeFilter->GetOutput()->GetLargestPossibleRegion());
-  itk::ImageRegionConstIterator<ImageType> yDerivativeIterator(yDerivativeFilter->GetOutput(),
-                                                               yDerivativeFilter->GetOutput()->GetLargestPossibleRegion());
-
-  while(!outputIterator.IsAtEnd())
-    {
-    DerivativeImageType::PixelType pixel;
-    pixel[0] = xDerivativeIterator.Get();
-    pixel[1] = yDerivativeIterator.Get();
-
-    outputIterator.Set(pixel);
-    ++outputIterator;
-    ++xDerivativeIterator;
-    ++yDerivativeIterator;
-    }
-
-  // Write the result
-  typedef  itk::ImageFileWriter<DerivativeImageType> WriterType;
-  WriterType::Pointer writer = WriterType::New();
-  writer->SetFileName(outputFilename);
-  writer->SetInput(derivativeImage);
-  writer->Update();
+  GradientWriterType::Pointer gradientWriter = GradientWriterType::New();
+  gradientWriter->SetFileName(outputFilenameGradient);
+  gradientWriter->SetInput(composeImageFilterType->GetOutput());
+  gradientWriter->Update();
 
   return EXIT_SUCCESS;
 }

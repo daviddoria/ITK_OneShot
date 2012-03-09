@@ -35,18 +35,23 @@ int main(int argc, char *argv[])
   reader->SetFileName(inputFilename);
   reader->Update();
 
-  typedef itk::RegionOfInterestImageFilter< ImageType, ImageType > FilterType;
-  FilterType::Pointer filter = FilterType::New();
+  typedef itk::RegionOfInterestImageFilter<ImageType, ImageType> RegionOfInterestImageFilterType;
+  RegionOfInterestImageFilterType::Pointer regionOfInterestImageFilter = RegionOfInterestImageFilterType::New();
   ImageType::RegionType desiredRegion(corner, size);
-  filter->SetRegionOfInterest(desiredRegion);
-  filter->SetInput(reader->GetOutput());
-  filter->Update();
+  regionOfInterestImageFilter->SetRegionOfInterest(desiredRegion);
+  regionOfInterestImageFilter->SetInput(reader->GetOutput());
+  regionOfInterestImageFilter->Update();
+
+  // Set the origin to (0,0) so the output image looks like a full image rather than looking like it was extracted from an image
+  ImageType::PointType origin;
+  origin.Fill(0);
+  regionOfInterestImageFilter->GetOutput()->SetOrigin(origin);
 
   // Write the result
   typedef  itk::ImageFileWriter<ImageType> WriterType;
   WriterType::Pointer writer = WriterType::New();
   writer->SetFileName(outputFilename);
-  writer->SetInput(filter->GetOutput());
+  writer->SetInput(regionOfInterestImageFilter->GetOutput());
   writer->Update();
 
   return EXIT_SUCCESS;

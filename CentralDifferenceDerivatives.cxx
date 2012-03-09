@@ -1,33 +1,34 @@
 #include "itkImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkCovariantVector.h"
 #include "itkImageRegionIterator.h"
-#include "itkNeighborhoodOperatorImageFilter.h"
 #include "itkDerivativeImageFilter.h"
+#include "itkComposeImageFilter.h"
 
 typedef itk::Image<float, 2> ImageType;
 
 int main(int argc, char *argv[])
 {
-  if(argc < 4)
+  if(argc < 6)
     {
-    std::cerr << "Required: inputFilename outputFilenameX outputFilenameY order" << std::endl;
+    std::cerr << "Required: inputFilename outputFilenameX outputFilenameY outputGradientFileName order" << std::endl;
     return EXIT_FAILURE;
     }
 
   std::string inputFilename = argv[1];
   std::string outputFilenameX = argv[2];
   std::string outputFilenameY = argv[3];
+  std::string outputFilenameGradient = argv[4];
 
   std::stringstream ssOrder;
-  ssOrder << argv[4];
+  ssOrder << argv[5];
   unsigned int order = 1;
   ssOrder >> order;
 
   std::cout << "inputFilename " << inputFilename << std::endl;
   std::cout << "outputFilenameX " << outputFilenameX << std::endl;
   std::cout << "outputFilenameY " << outputFilenameY << std::endl;
+  std::cout << "outputFilenameGradient " << outputFilenameGradient << std::endl;
   std::cout << "order " << order << std::endl;
 
   typedef itk::ImageFileReader<ImageType> ReaderType;
@@ -48,6 +49,13 @@ int main(int argc, char *argv[])
   yDerivativeFilter->SetInput(reader->GetOutput());
   yDerivativeFilter->Update();
 
+  typedef itk::ComposeImageFilter<ImageType> ComposeImageFilterType;
+  ComposeImageFilterType::Pointer composeImageFilterType = ComposeImageFilterType::New();
+  composeImageFilterType->SetInput(0, xDerivativeFilter->GetOutput());
+  composeImageFilterType->SetInput(1, yDerivativeFilter->GetOutput());
+  composeImageFilterType->Update();
+
+  {
   typedef  itk::ImageFileWriter<ImageType> WriterType;
 
   WriterType::Pointer xWriter = WriterType::New();
@@ -59,6 +67,14 @@ int main(int argc, char *argv[])
   yWriter->SetFileName(outputFilenameY);
   yWriter->SetInput(yDerivativeFilter->GetOutput());
   yWriter->Update();
+  }
 
+  typedef  itk::ImageFileWriter<typename ComposeImageFilterType::OutputImageType> GradientWriterType;
+
+  GradientWriterType::Pointer gradientWriter = GradientWriterType::New();
+  gradientWriter->SetFileName(outputFilenameGradient);
+  gradientWriter->SetInput(composeImageFilterType->GetOutput());
+  gradientWriter->Update();
+  
   return EXIT_SUCCESS;
 }

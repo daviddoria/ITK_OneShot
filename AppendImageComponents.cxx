@@ -35,6 +35,13 @@ int main(int argc, char *argv[])
   image2Reader->SetFileName(image2Filename.c_str());
   image2Reader->Update();
 
+  // Should be able to use this instead, but it doesn't work with itk::VectorImage:
+//   typedef itk::JoinImageFilter<ImageType, ImageType> JoinImageFilterType;
+//   JoinImageFilterType::Pointer joinFilter = JoinImageFilterType::New();
+//   joinFilter->SetInput1(image1);
+//   joinFilter->SetInput2(image2);
+//   joinFilter->Update();
+//   
   if(image1Reader->GetOutput()->GetLargestPossibleRegion() != image2Reader->GetOutput()->GetLargestPossibleRegion())
     {
     std::cerr << "Images must be the same size!" << std::endl;
