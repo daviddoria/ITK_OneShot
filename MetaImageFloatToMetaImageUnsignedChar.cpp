@@ -34,8 +34,10 @@ int main(int argc, char *argv[])
   outputImage->SetRegions(reader->GetOutput()->GetLargestPossibleRegion());
   outputImage->Allocate();
   
-  itk::ImageRegionConstIterator<FloatImageType> inputIterator(reader->GetOutput(), reader->GetOutput()->GetLargestPossibleRegion());
-  itk::ImageRegionIterator<UnsignedCharImageType> outputIterator(outputImage, outputImage->GetLargestPossibleRegion());
+  itk::ImageRegionConstIterator<FloatImageType> inputIterator(reader->GetOutput(),
+                                                              reader->GetOutput()->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<UnsignedCharImageType> outputIterator(outputImage,
+                                                                 outputImage->GetLargestPossibleRegion());
 
   while(!inputIterator.IsAtEnd())
     {

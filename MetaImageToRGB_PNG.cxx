@@ -5,8 +5,10 @@
 
 typedef itk::Image<itk::CovariantVector<unsigned char, 3>, 2>  ImageType;
 
-// This application relies on the automatic casting that happens when opening an image. The input is expected to be a 3-channel Meta image.
-// It will be automatically cast to the RGB type we have defined when it is opened, so it can simply be written immediately to perform the conversion.
+// This application relies on the automatic casting that happens when opening an image.
+// The input is expected to be a 3-channel Meta image.
+// It will be automatically cast to the RGB type we have defined when it is opened,
+// so it can simply be written immediately to perform the conversion.
 int main(int argc, char *argv[])
 {
   // Verify arguments
