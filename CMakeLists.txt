@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 2.6)
 
 PROJECT(ITK_OneShot)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x")
 SET( INSTALL_DIR ${CMAKE_INSTALL_PREFIX} )
 
 FIND_PACKAGE(ITK REQUIRED)
 INCLUDE(${ITK_USE_FILE})
 
+add_subdirectory(ITKHelpers)
 # the 'os' prefix stands for "one shot" and is simply to group the executables when they are installed
 
 SET(OS_AbsImage CACHE BOOL "Compute the absolute value (pixel-wise) of an image")
@@ -55,6 +57,13 @@ if(OS_CreateConstantScalarImage)
   ADD_EXECUTABLE(osCreateConstantScalarImage CreateConstantScalarImage.cpp)
   TARGET_LINK_LIBRARIES(osCreateConstantScalarImage ${ITK_LIBRARIES})
   INSTALL( TARGETS osCreateConstantScalarImage RUNTIME DESTINATION ${INSTALL_DIR} )
+endif()
+
+SET(OS_CreateConstantVectorImage CACHE BOOL "Create a vector image where every element of every pixel is set to the same scalar.")
+if(OS_CreateConstantVectorImage)
+  ADD_EXECUTABLE(osCreateConstantVectorImage CreateConstantVectorImage.cpp)
+  TARGET_LINK_LIBRARIES(osCreateConstantVectorImage ${ITK_LIBRARIES})
+  INSTALL( TARGETS osCreateConstantVectorImage RUNTIME DESTINATION ${INSTALL_DIR} )
 endif()
 
 SET(OS_Downsample CACHE BOOL "Downsample an image")
@@ -242,15 +251,8 @@ endif()
 SET(OS_FlipImage CACHE BOOL "Flip an image vertically")
 if(OS_FlipImage)
   ADD_EXECUTABLE(osFlipImage FlipImage.cxx)
-  TARGET_LINK_LIBRARIES(osFlipImage ${ITK_LIBRARIES})
+  TARGET_LINK_LIBRARIES(osFlipImage ${ITK_LIBRARIES} ITKHelpers)
   INSTALL( TARGETS osFlipImage RUNTIME DESTINATION ${INSTALL_DIR} )
-endif()
-
-SET(OS_FlipImageFloat CACHE BOOL "Flip an image vertically")
-if(OS_FlipImageFloat)
-  ADD_EXECUTABLE(osFlipImageFloat FlipImageFloat.cpp)
-  TARGET_LINK_LIBRARIES(osFlipImageFloat ${ITK_LIBRARIES})
-  INSTALL( TARGETS osFlipImageFloat RUNTIME DESTINATION ${INSTALL_DIR} )
 endif()
 
 SET(OS_ForwardDifferenceDerivatives CACHE BOOL "Compute the forward difference derivatives of an image")
@@ -286,6 +288,13 @@ if(OS_MakeImagePositive)
   ADD_EXECUTABLE(osMakeImagePositive MakeImagePositive.cxx)
   TARGET_LINK_LIBRARIES(osMakeImagePositive ${ITK_LIBRARIES})
   INSTALL( TARGETS osMakeImagePositive RUNTIME DESTINATION ${INSTALL_DIR} )
+endif()
+
+SET(OS_MarkPoints CACHE BOOL "Mark points.")
+if(OS_MarkPoints)
+  ADD_EXECUTABLE(osMarkPoints MarkPoints.cxx)
+  TARGET_LINK_LIBRARIES(MarkPoints ${ITK_LIBRARIES})
+  INSTALL( TARGETS osMarkPoints RUNTIME DESTINATION ${INSTALL_DIR} )
 endif()
 
 SET(OS_MaskBoundingBox CACHE BOOL "Mask an image")

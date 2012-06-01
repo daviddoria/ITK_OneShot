@@ -1,7 +1,7 @@
 #include "itkImage.h"
 #include "itkImageFileWriter.h"
 
-typedef itk::Image<float, 2> ImageType;
+typedef itk::VectorImage<float, 2> ImageType;
 
 template<typename TImage>
 void SetRegionToConstant(TImage* const image, const itk::ImageRegion<2>& region,
@@ -10,9 +10,9 @@ void SetRegionToConstant(TImage* const image, const itk::ImageRegion<2>& region,
 int main(int argc, char *argv[])
 {
   // Verify arguments
-  if(argc < 5)
+  if(argc < 6)
     {
-    std::cerr << "Required: outputFilename sizeX sizeY value" << std::endl;
+    std::cerr << "Required: outputFilename sizeX sizeY components value" << std::endl;
     return EXIT_FAILURE;
     }
 
@@ -23,8 +23,9 @@ int main(int argc, char *argv[])
   ss << argv[2] << " " << argv[3] << " " << argv[4];
 
   itk::Size<2> size = {{0,0}};
+  unsigned int components = 0;
   float value = 0.0f;
-  ss >> size[0] >> size[1] >> value;
+  ss >> size[0] >> size[1] >> components >> value;
 
 
   // Output arguments
@@ -38,10 +39,21 @@ int main(int argc, char *argv[])
   itk::ImageRegion<2> region(index, size);
 
   image->SetRegions(region);
+  image->SetNumberOfComponentsPerPixel(components);
   image->Allocate();
 
-  SetRegionToConstant(image.GetPointer(), image->GetLargestPossibleRegion(), value);
+  typename itk::ImageRegionIterator<ImageType> imageIterator(image, image->GetLargestPossibleRegion());
 
+  ImageType::PixelType pixel;
+  pixel.SetSize(components);
+  pixel.Fill(value);
+  
+  while(!imageIterator.IsAtEnd())
+    {
+    imageIterator.Set(pixel);
+
+    ++imageIterator;
+    }
 
   // Write the result
   typedef  itk::ImageFileWriter<ImageType> WriterType;
@@ -51,17 +63,4 @@ int main(int argc, char *argv[])
   writer->Update();
 
   return EXIT_SUCCESS;
-}
-
-template<typename TImage>
-void SetRegionToConstant(TImage* image, const itk::ImageRegion<2>& region, const typename TImage::PixelType& value)
-{
-  typename itk::ImageRegionIterator<TImage> imageIterator(image, region);
-
-  while(!imageIterator.IsAtEnd())
-    {
-    imageIterator.Set(value);
-
-    ++imageIterator;
-    }
 }

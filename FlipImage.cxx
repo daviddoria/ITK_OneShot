@@ -1,10 +1,12 @@
-#include "itkImage.h"
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
 #include "itkFlipImageFilter.h"
 #include "itkFixedArray.h"
+#include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
+#include "itkVectorImage.h"
 
-typedef itk::Image<itk::CovariantVector<unsigned char, 3>, 2>  RGBImageType;
+#include "ITKHelpers/ITKHelpers.h"
+
+typedef itk::VectorImage<float, 2> ImageType;
 
 int main(int argc, char *argv[])
 {
@@ -17,12 +19,12 @@ int main(int argc, char *argv[])
   std::string inputFilename = argv[1];
   std::string outputFilename = argv[2];
 
-  typedef itk::ImageFileReader<RGBImageType> ReaderType;
+  typedef itk::ImageFileReader<ImageType> ReaderType;
   ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName(inputFilename.c_str());
   reader->Update();
 
-  typedef itk::FlipImageFilter <RGBImageType> FlipImageFilterType;
+  typedef itk::FlipImageFilter<ImageType> FlipImageFilterType;
   FlipImageFilterType::Pointer flipFilter = FlipImageFilterType::New ();
   flipFilter->SetInput(reader->GetOutput());
 
@@ -31,16 +33,22 @@ int main(int argc, char *argv[])
   flipAxes[1] = true;
   flipFilter->SetFlipAxes(flipAxes);
   flipFilter->Update();
-  
-  RGBImageType::PointType origin;
+
+  ImageType::PointType origin;
   origin.Fill(0);
   flipFilter->GetOutput()->SetOrigin(origin);
 
-  typedef  itk::ImageFileWriter< RGBImageType  > WriterType;
-  WriterType::Pointer writer = WriterType::New();
-  writer->SetFileName(outputFilename);
-  writer->SetInput(flipFilter->GetOutput());
-  writer->Update();
+  bool ucharType = ITKHelpers::GetPixelTypeFromFile(inputFilename) == itk::ImageIOBase::UCHAR;
+  unsigned int components = reader->GetOutput()->GetNumberOfComponentsPerPixel();
+  if( (ucharType && components == 3) ||
+      (ucharType && components == 1))
+  {
+    ITKHelpers::WriteRGBImage(flipFilter->GetOutput(), outputFilename);
+  }
+  else
+  {
+    ITKHelpers::WriteImage(flipFilter->GetOutput(), outputFilename);
+  }
 
   return EXIT_SUCCESS;
 }
