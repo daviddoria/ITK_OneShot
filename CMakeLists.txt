@@ -4,11 +4,16 @@ PROJECT(ITK_OneShot)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x")
 SET( INSTALL_DIR ${CMAKE_INSTALL_PREFIX} )
 
-FIND_PACKAGE(ITK REQUIRED)
+FIND_PACKAGE(ITK REQUIRED ITKCommon ITKIOImageBase ITKTestKernel
+             ITKImageIntensity ITKImageFeature ITKMathematicalMorphology ITKBinaryMathematicalMorphology ITKDistanceMap)
 INCLUDE(${ITK_USE_FILE})
 
-add_subdirectory(ITKHelpers)
-# the 'os' prefix stands for "one shot" and is simply to group the executables when they are installed
+if(NOT TARGET ITKHelpers)
+  add_subdirectory(ITKHelpers)
+  include_directories(${ITKHelpers_includes})
+endif()
+
+# The 'os' prefix stands for "one shot" and is simply to group the executables when they are installed
 
 SET(OS_AbsImage CACHE BOOL "Compute the absolute value (pixel-wise) of an image")
 if(OS_AbsImage)
@@ -237,7 +242,7 @@ endif()
 SET(OS_ExtractRegion CACHE BOOL "Extract a specified region of an image")
 if(OS_ExtractRegion)
   ADD_EXECUTABLE(osExtractRegion ExtractRegion.cpp)
-  TARGET_LINK_LIBRARIES(osExtractRegion ${ITK_LIBRARIES})
+  TARGET_LINK_LIBRARIES(osExtractRegion ${ITK_LIBRARIES} ITKHelpers)
   INSTALL( TARGETS osExtractRegion RUNTIME DESTINATION ${INSTALL_DIR} )
 endif()
 

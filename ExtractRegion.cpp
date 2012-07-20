@@ -1,7 +1,12 @@
+// ITK
 #include "itkVectorImage.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkRegionOfInterestImageFilter.h"
+
+// Submodules
+#include "Helpers/Helpers.h"
+#include "ITKHelpers/ITKHelpers.h"
 
 typedef itk::VectorImage<float, 2> ImageType;
 
@@ -48,11 +53,14 @@ int main(int argc, char *argv[])
   regionOfInterestImageFilter->GetOutput()->SetOrigin(origin);
 
   // Write the result
-  typedef  itk::ImageFileWriter<ImageType> WriterType;
-  WriterType::Pointer writer = WriterType::New();
-  writer->SetFileName(outputFilename);
-  writer->SetInput(regionOfInterestImageFilter->GetOutput());
-  writer->Update();
+  if(Helpers::GetFileExtension(outputFilename) == "png")
+  {
+    ITKHelpers::WriteRGBImage(regionOfInterestImageFilter->GetOutput(), outputFilename);
+  }
+  else
+  {
+    ITKHelpers::WriteImage(regionOfInterestImageFilter->GetOutput(), outputFilename);
+  }
 
   return EXIT_SUCCESS;
 }
