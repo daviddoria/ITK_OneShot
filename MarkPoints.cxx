@@ -62,9 +62,9 @@ void MarkPatch(ImageType::Pointer image, itk::Index<2> center, unsigned int radi
   red.SetGreen(0);
   red.SetBlue(0);
 
-  for(int i = center[0] - radius; i < center[0] + radius; ++i)
+  for(int i = center[0] - static_cast<int>(radius); i < center[0] + static_cast<int>(radius); ++i)
   {
-    for(int j = center[1] - radius; j < center[1] + radius; ++j)
+    for(int j = center[1] - static_cast<int>(radius); j < center[1] + static_cast<int>(radius); ++j)
     {
     itk::Index<2> index;
     index[0] = i;

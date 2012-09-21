@@ -10,6 +10,8 @@ typedef itk::Image<unsigned char, 2>  MaskType;
 // This code replaces every pixel in 'imageFilename' corresponding to a non-zero pixel in 'maskFilename' with 'value'
 int main(int argc, char *argv[])
 {
+  std::cout << "Warning: This uses a simple Image<uchar> for the mask type, not the powerful Mask class in the Mask repository." << std::endl;
+
   // Verify arguments
   if(argc < 4)
     {

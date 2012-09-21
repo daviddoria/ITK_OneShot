@@ -1,13 +1,21 @@
 cmake_minimum_required(VERSION 2.6)
 
 PROJECT(ITK_OneShot)
+
+# C++11 standard usage
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++0x")
+
+# Set the path to install executables to
 SET( INSTALL_DIR ${CMAKE_INSTALL_PREFIX} )
 
+# ITK
 FIND_PACKAGE(ITK REQUIRED ITKCommon ITKIOImageBase ITKTestKernel
-             ITKImageIntensity ITKImageFeature ITKMathematicalMorphology ITKBinaryMathematicalMorphology ITKDistanceMap)
+             ITKImageIntensity ITKImageFeature ITKMathematicalMorphology
+             ITKBinaryMathematicalMorphology ITKDistanceMap ITKImageCompare
+             ITKColormap)
 INCLUDE(${ITK_USE_FILE})
 
+# ITKHelpers submodule
 if(NOT TARGET ITKHelpers)
   add_subdirectory(ITKHelpers)
   include_directories(${ITKHelpers_includes})
@@ -298,7 +306,7 @@ endif()
 SET(OS_MarkPoints CACHE BOOL "Mark points.")
 if(OS_MarkPoints)
   ADD_EXECUTABLE(osMarkPoints MarkPoints.cxx)
-  TARGET_LINK_LIBRARIES(MarkPoints ${ITK_LIBRARIES})
+  TARGET_LINK_LIBRARIES(osMarkPoints ${ITK_LIBRARIES})
   INSTALL( TARGETS osMarkPoints RUNTIME DESTINATION ${INSTALL_DIR} )
 endif()
 
@@ -485,6 +493,47 @@ if(OS_SetBoundaryToConstantFloat)
   INSTALL( TARGETS osSetBoundaryToConstantFloat RUNTIME DESTINATION ${INSTALL_DIR} )
 endif()
 
+################ Options to turn on/off all executables ################
+
+# Add options to allow enabling/disabling of a set of targets
+option(TurnOnAllOneShot "all")
+option(TurnOffAllOneShot "all")
+
+# A function to get all user defined variables with a specified prefix
+function (getListOfVarsStartingWith _prefix _varResult)
+    get_cmake_property(_vars VARIABLES)
+    string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9_]*" _matchedVars "${_vars}")
+    set (${_varResult} ${_matchedVars} PARENT_SCOPE)
+endfunction()
+
+# Mass toggle "commands". These variables (TurnOnAll and TurnOffAll) let you
+# enable or disable all of the variables starting with "build_". This is an abuse
+# of a CMake "variable" to be used as an instruction to issue a command once.
+# For example, when TurnOnAll is set to ON and then configure is run, the following
+# block is run once, and then TurnOnAll sets itself back to OFF.
+if(TurnOnAllOneShot)
+    getListOfVarsStartingWith("OS_" matchedVars)
+    foreach (_var IN LISTS matchedVars)
+        set(${_var} ON CACHE BOOL "test" FORCE)
+    endforeach()
+
+    set(TurnOnAllOneShot OFF CACHE BOOL "test" FORCE)  # Set itself back to off, as this is a one time thing.
+endif()
+
+# In exactly the same manner, if TurnOffAll is set to ON, all of the variables starting with build_ are set to OFF.
+if(TurnOffAllOneShot)
+    getListOfVarsStartingWith("OS_" matchedVars)
+    foreach (_var IN LISTS matchedVars)
+        set(${_var} OFF CACHE BOOL "test" FORCE)
+    endforeach()
+
+    set(TurnOffAllOneShot OFF CACHE BOOL "test" FORCE)  # Set itself back to off, as this is a one time thing.
+endif()
+
+# Of course turning on all variables at the same time as turning off all variables does not make sense.
+if(TurnOffAllOneShot AND TurnOffAllOneShot)
+  message(FATAL_ERROR "You cannot turn targets on and off at the same time!")
+endif()
 
 ################
 add_subdirectory(Tests)

@@ -2,7 +2,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkVectorImage.h"
-#include "itkImageToVectorImageFilter.h"
+#include "itkComposeImageFilter.h"
 #include "itkVectorIndexSelectionCastImageFilter.h"
 #include "itkScaleTransform.h"
 #include "itkResampleImageFilter.h"
@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
 
   typedef itk::IdentityTransform<double, 2> T_Transform;
   
-  typedef itk::ImageToVectorImageFilter<ScalarImageType> ImageToVectorImageFilterType;
-  ImageToVectorImageFilterType::Pointer imageToVectorImageFilter = ImageToVectorImageFilterType::New();
+  typedef itk::ComposeImageFilter<ScalarImageType> ComposeImageFilterType;
+  ComposeImageFilterType::Pointer composeImageFilter = ComposeImageFilterType::New();
     
   typedef itk::ResampleImageFilter<ScalarImageType, ScalarImageType> ResampleFilterType;
   ResampleFilterType::Pointer resampleFilter = ResampleFilterType::New();
@@ -94,19 +94,19 @@ int main(int argc, char *argv[])
     strechedChannels.push_back(ScalarImageType::New());
     DeepCopy(resampleFilter->GetOutput(), strechedChannels[component]);
   
-    imageToVectorImageFilter->SetNthInput(component, strechedChannels[component]);
+    composeImageFilter->SetInput(component, strechedChannels[component]);
   
     }
 
-  imageToVectorImageFilter->Update();
+  composeImageFilter->Update();
   
-  std::cout << "Final output size: " << imageToVectorImageFilter->GetOutput()->GetLargestPossibleRegion().GetSize() << std::endl;
+  std::cout << "Final output size: " << composeImageFilter->GetOutput()->GetLargestPossibleRegion().GetSize() << std::endl;
   
   // Write the result
   typedef  itk::ImageFileWriter<VectorImageType> WriterType;
   WriterType::Pointer writer = WriterType::New();
   writer->SetFileName(outputFilename);
-  writer->SetInput(imageToVectorImageFilter->GetOutput());
+  writer->SetInput(composeImageFilter->GetOutput());
   writer->Update();
 
   return EXIT_SUCCESS;

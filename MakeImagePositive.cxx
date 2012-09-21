@@ -2,7 +2,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkMinimumMaximumImageCalculator.h"
-#include "itkAddConstantToImageFilter.h"
+#include "itkAddImageFilter.h"
 
 int main(int argc, char* argv[])
 {
@@ -23,16 +23,16 @@ int main(int argc, char* argv[])
   imageCalculatorFilter->SetImage(imageReader->GetOutput());
   imageCalculatorFilter->Compute();
 
-  typedef itk::AddConstantToImageFilter <ImageType, float, ImageType> AddConstantToImageFilterType;
-  AddConstantToImageFilterType::Pointer addConstantToImageFilter = AddConstantToImageFilterType::New();
-  addConstantToImageFilter->SetInput(imageReader->GetOutput());
-  addConstantToImageFilter->SetConstant(fabs(imageCalculatorFilter->GetMinimum()));
-  addConstantToImageFilter->Update();
+  typedef itk::AddImageFilter <ImageType> AddImageFilterType;
+  AddImageFilterType::Pointer addImageFilter = AddImageFilterType::New();
+  addImageFilter->SetInput1(imageReader->GetOutput());
+  addImageFilter->SetConstant2(fabs(imageCalculatorFilter->GetMinimum()));
+  addImageFilter->Update();
 
   typedef  itk::ImageFileWriter< ImageType > WriterType;
   WriterType::Pointer writer = WriterType::New();
   writer->SetFileName(outputFileName);
-  writer->SetInput(addConstantToImageFilter->GetOutput());
+  writer->SetInput(addImageFilter->GetOutput());
   writer->Update();
 
   return EXIT_SUCCESS;
