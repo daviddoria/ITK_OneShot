@@ -8,47 +8,61 @@
 #include "Helpers/Helpers.h"
 #include "ITKHelpers/ITKHelpers.h"
 
-std::vector<itk::Index<2> > GetBoundaryPixels(const itk::ImageRegion<2>& region)
+std::vector<itk::Index<2> > GetBoundaryPixels(const itk::ImageRegion<2>& region, const unsigned int thickness)
 {
   std::vector<itk::Index<2> > boundaryPixels;
 
-  for(unsigned int i = region.GetIndex()[0]; i < region.GetIndex()[0] + region.GetSize()[0]; ++i)
+  typedef itk::Image<float,2> DummyImageType;
+  DummyImageType::Pointer dummyImage = DummyImageType::New();
+  dummyImage->SetRegions(region);
+
+  itk::ImageRegionIteratorWithIndex<DummyImageType> imageIterator(dummyImage, region);
+
+  while(!imageIterator.IsAtEnd())
+  {
+    if( (abs(imageIterator.GetIndex()[0] - region.GetIndex()[0]) < static_cast<itk::Index<2>::IndexValueType>(thickness)) ||
+        (abs(imageIterator.GetIndex()[0] - (region.GetIndex()[0] + region.GetSize()[0] - 1)) < static_cast<itk::Index<2>::IndexValueType>(thickness)) ||
+        (abs(imageIterator.GetIndex()[1] - region.GetIndex()[1]) < static_cast<itk::Index<2>::IndexValueType>(thickness)) ||
+        (abs(imageIterator.GetIndex()[1] - (region.GetIndex()[1] + region.GetSize()[1] - 1)) < static_cast<itk::Index<2>::IndexValueType>(thickness)))
     {
-    itk::Index<2> index;
-    index[0] = i;
-    index[1] = region.GetIndex()[1];
-    boundaryPixels.push_back(index);
-
-    index[0] = i;
-    index[1] = region.GetIndex()[1] + region.GetSize()[1] - 1;
-    boundaryPixels.push_back(index);
+      boundaryPixels.push_back(imageIterator.GetIndex());
     }
-
-  for(unsigned int j = region.GetIndex()[1]; j < region.GetIndex()[1] + region.GetSize()[1]; ++j)
-    {
-    itk::Index<2> index;
-    index[0] = region.GetIndex()[0];
-    index[1] = j;
-    boundaryPixels.push_back(index);
-
-    index[0] = region.GetIndex()[0] + region.GetSize()[0] - 1;
-    index[1] = j;
-    boundaryPixels.push_back(index);
-    }
+    ++imageIterator;
+  }
 
   return boundaryPixels;
 }
 
-template<typename TImage>
-void OutlineRegion(TImage* image, const itk::ImageRegion<2>& region, const typename TImage::PixelType& value)
-{
-  std::vector<itk::Index<2> > boundaryPixels = GetBoundaryPixels(region);
+//std::vector<itk::Index<2> > GetBoundaryPixels(const itk::ImageRegion<2>& region)
+//{
+//  std::vector<itk::Index<2> > boundaryPixels;
 
-  for(unsigned int i = 0; i < boundaryPixels.size(); ++i)
-    {
-    image->SetPixel(boundaryPixels[i], value);
-    }
-}
+//  for(unsigned int i = region.GetIndex()[0]; i < region.GetIndex()[0] + region.GetSize()[0]; ++i)
+//    {
+//    itk::Index<2> index;
+//    index[0] = i;
+//    index[1] = region.GetIndex()[1];
+//    boundaryPixels.push_back(index);
+
+//    index[0] = i;
+//    index[1] = region.GetIndex()[1] + region.GetSize()[1] - 1;
+//    boundaryPixels.push_back(index);
+//    }
+
+//  for(unsigned int j = region.GetIndex()[1]; j < region.GetIndex()[1] + region.GetSize()[1]; ++j)
+//    {
+//    itk::Index<2> index;
+//    index[0] = region.GetIndex()[0];
+//    index[1] = j;
+//    boundaryPixels.push_back(index);
+
+//    index[0] = region.GetIndex()[0] + region.GetSize()[0] - 1;
+//    index[1] = j;
+//    boundaryPixels.push_back(index);
+//    }
+
+//  return boundaryPixels;
+//}
 
 template <typename TImage>
 void SetPixels(TImage* const image, const std::vector<itk::Index<2> >& pixels, const typename TImage::PixelType& value)
@@ -59,12 +73,20 @@ void SetPixels(TImage* const image, const std::vector<itk::Index<2> >& pixels, c
     }
 }
 
+template<typename TImage>
+void OutlineRegion(TImage* image, const itk::ImageRegion<2>& region, const typename TImage::PixelType& value, const unsigned int thickness)
+{
+  std::vector<itk::Index<2> > boundaryPixels = GetBoundaryPixels(region, thickness);
+
+  SetPixels(image, boundaryPixels, value);
+}
+
 int main(int argc, char *argv[])
 {
   // Verify arguments
-  if(argc < 10)
+  if(argc < 11)
     {
-    std::cerr << "Required: inputFilename cornerX cornerY sizeX sizeY R G B outputFilename" << std::endl;
+    std::cerr << "Required: inputFilename cornerX cornerY sizeX sizeY R G B thickness outputFilename" << std::endl;
     return EXIT_FAILURE;
     }
 
@@ -99,7 +121,12 @@ int main(int argc, char *argv[])
   boundaryValue[1] = boundaryValueInt[1];
   boundaryValue[2] = boundaryValueInt[2];
 
-  std::string outputFilename = argv[9];
+  std::stringstream ssThickness;
+  ssThickness << argv[9];
+  int thickness;
+  ssThickness >> thickness;
+
+  std::string outputFilename = argv[10];
 
   ImageType::RegionType region(corner, size);
 
@@ -108,6 +135,7 @@ int main(int argc, char *argv[])
   std::cout << "corner " << corner << std::endl;
   std::cout << "size " << size << std::endl;
   std::cout << "boundaryValue " << boundaryValue << std::endl;
+  std::cout << "boundaryValue " << thickness << std::endl;
   std::cout << "outputFilename " << outputFilename << std::endl;
 
   // Read file
@@ -119,9 +147,7 @@ int main(int argc, char *argv[])
 
   ImageType* image = reader->GetOutput();
 
-  std::vector<itk::Index<2> > boundaryPixels = GetBoundaryPixels(region);
-
-  SetPixels(image, boundaryPixels, boundaryValue);
+  OutlineRegion(image, region, boundaryValue, thickness);
 
   // Write the result
   if(Helpers::GetFileExtension(outputFilename) == "png")
