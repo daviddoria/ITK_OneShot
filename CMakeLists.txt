@@ -247,6 +247,13 @@ if(OS_ExtractComponentsPNG)
   INSTALL( TARGETS osExtractComponentsPNG RUNTIME DESTINATION ${INSTALL_DIR} )
 endif()
 
+SET(OS_OutlineRegion CACHE BOOL "Extract a specified region of an image")
+if(OS_OutlineRegion)
+  ADD_EXECUTABLE(osOutlineRegion OutlineRegion.cpp)
+  TARGET_LINK_LIBRARIES(osOutlineRegion ${ITK_LIBRARIES} ITKHelpers)
+  INSTALL( TARGETS osOutlineRegion RUNTIME DESTINATION ${INSTALL_DIR} )
+endif()
+
 SET(OS_ExtractRegion CACHE BOOL "Extract a specified region of an image")
 if(OS_ExtractRegion)
   ADD_EXECUTABLE(osExtractRegion ExtractRegion.cpp)
