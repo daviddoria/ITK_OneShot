@@ -28,7 +28,8 @@ int main(int argc, char *argv[])
 
   itk::ImageRegionConstIterator<ImageType> imageIterator(reader->GetOutput(), reader->GetOutput()->GetLargestPossibleRegion());
 
-  itk::Index<2> min = {{reader->GetOutput()->GetLargestPossibleRegion().GetSize()[0], reader->GetOutput()->GetLargestPossibleRegion().GetSize()[1]}};
+  itk::Index<2> min = {{static_cast<itk::Index<2>::IndexValueType>(reader->GetOutput()->GetLargestPossibleRegion().GetSize()[0]),
+                        static_cast<itk::Index<2>::IndexValueType>(reader->GetOutput()->GetLargestPossibleRegion().GetSize()[1])}};
   itk::Index<2> max = {{0, 0}};
   
   while(!imageIterator.IsAtEnd())
@@ -55,7 +56,8 @@ int main(int argc, char *argv[])
     ++imageIterator;
     }
 
-  itk::Size<2> size = {{max[0] - min[0], max[1] - min[1]}};
+  itk::Size<2> size = {{static_cast<itk::Size<2>::SizeValueType>(max[0] - min[0]),
+                        static_cast<itk::Size<2>::SizeValueType>(max[1] - min[1])}};
   itk::ImageRegion<2> region(min, size);
   std::cout << region << std::endl;
   

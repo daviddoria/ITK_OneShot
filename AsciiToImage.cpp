@@ -74,9 +74,9 @@ int main(int argc, char *argv[])
   image->SetRegions(region);
   image->Allocate();
 
-  for(unsigned int row = 0; row < numberOfValidRows; ++row)
+  for(int row = 0; row < static_cast<int>(numberOfValidRows); ++row)
   {
-    for(unsigned int col = 0; col < numberOfColumns; ++col)
+    for(int col = 0; col < static_cast<int>(numberOfColumns); ++col)
     {
     //itk::Index<2> index = {{row, col}}; // This is wrong
     itk::Index<2> index = {{col, row}};

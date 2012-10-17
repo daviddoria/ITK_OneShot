@@ -5,8 +5,8 @@
 #include "itkImageRegionConstIterator.h"
 
 // Submodules
-#include "Helpers/Helpers.h"
-#include "ITKHelpers/ITKHelpers.h"
+#include <Helpers/Helpers.h>
+#include <ITKHelpers/ITKHelpers.h>
 
 typedef itk::VectorImage<float, 2> ImageType;
 typedef itk::Image<unsigned char, 2> PixelImageType;
